@@ -1,5 +1,6 @@
 #include "Soundex.h"
 #include <cctype>
+#include <string>
 
 char getSoundexCode(char c) {
     c = toupper(c);
@@ -12,6 +13,14 @@ char getSoundexCode(char c) {
         case 'R': return '6';
         default: return '0'; // For A, E, I, O, U, H, W, Y
     }
+}
+
+std::string padSoundex(const std::string& soundex) {
+    std::string paddedSoundex = soundex;
+    while (paddedSoundex.length() < 4) {
+        paddedSoundex += '0';
+    }
+    return paddedSoundex;
 }
 
 std::string generateSoundex(const std::string& name) {
@@ -28,9 +37,5 @@ std::string generateSoundex(const std::string& name) {
         }
     }
 
-    while (soundex.length() < 4) {
-        soundex += '0';
-    }
-
-    return soundex;
+    return padSoundex(soundex);
 }
