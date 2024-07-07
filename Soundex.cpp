@@ -1,6 +1,6 @@
+#include "header.h"
 #include <cctype>
 #include <unordered_map>
-#include <string>
 
 static const std::unordered_map<char, char> soundexMap {
     {'B', '1'}, {'F', '1'}, {'P', '1'}, {'V', '1'},
