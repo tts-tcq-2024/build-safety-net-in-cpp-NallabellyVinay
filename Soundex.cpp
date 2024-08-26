@@ -1,37 +1,72 @@
-#include "Soundex.h"
-#include <cctype>
-#include <unordered_map>
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-static const std::unordered_map<char, char> soundexMap {
-    {'B', '1'}, {'F', '1'}, {'P', '1'}, {'V', '1'},
-    {'C', '2'}, {'G', '2'}, {'J', '2'}, {'K', '2'}, {'Q', '2'}, {'S', '2'}, {'X', '2'}, {'Z', '2'},
-    {'D', '3'}, {'T', '3'},
-    {'L', '4'},
-    {'M', '5'}, {'N', '5'},
-    {'R', '6'}
-};
+public class Soundex
+{
+    private static readonly Dictionary<char, char> soundexMap = new Dictionary<char, char>
+    {
+        { 'B', '1' }, { 'F', '1' }, { 'P', '1' }, { 'V', '1' },
+        { 'C', '2' }, { 'G', '2' }, { 'J', '2' }, { 'K', '2' },
+        { 'Q', '2' }, { 'S', '2' }, { 'X', '2' }, { 'Z', '2' },
+        { 'D', '3' }, { 'T', '3' },
+        { 'L', '4' },
+        { 'M', '5' }, { 'N', '5' },
+        { 'R', '6' }
+    };
 
-char getSoundexCode(char c) {
-    c = std::toupper(c);
-    return soundexMap.count(c) ? soundexMap.at(c) : '0';
-}
+    public static string GenerateSoundex(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return string.Empty;
+        }
 
-std::string generateSoundex(const std::string& name) {
-    if (name.empty()) return "";
+        StringBuilder soundex = new StringBuilder();
+        soundex.Append(char.ToUpper(name[0]));
+        char prevCode = GetSoundexCode(name[0]);
 
-    std::string soundex;
-    soundex += std::toupper(name[0]);
-    char prevCode = getSoundexCode(name[0]);
+        ProcessCharacters(name, soundex, ref prevCode);
 
-    for (size_t i = 1; i < name.length() && soundex.length() < 4; ++i) {
-        char code = getSoundexCode(name[i]);
-        if (code != '0' && code != prevCode) {
-            soundex += code;
+        return PadSoundex(soundex).ToString();
+    }
+
+    private static void ProcessCharacters(string name, StringBuilder soundex, ref char prevCode)
+    {
+        for (int i = 1; i < name.Length && soundex.Length < 4; i++)
+        {
+            AppendSoundexCode(name[i], soundex, ref prevCode);
+        }
+    }
+
+    private static void AppendSoundexCode(char c, StringBuilder soundex, ref char prevCode)
+    {
+        char code = GetSoundexCode(c);
+        if (IsAppendableCode(code, prevCode))
+        {
+            soundex.Append(code);
             prevCode = code;
         }
     }
 
-    soundex.append(4 - soundex.length(), '0');
+    private static bool IsAppendableCode(char code, char prevCode)
+    {
+        return code != '0' && code != prevCode;
+    }
 
-    return soundex;
+    private static StringBuilder PadSoundex(StringBuilder soundex)
+    {
+        while (soundex.Length < 4)
+        {
+            soundex.Append('0');
+        }
+
+        return soundex;
+    }
+
+    private static char GetSoundexCode(char c)
+    {
+        c = char.ToUpper(c);
+        return soundexMap.ContainsKey(c) ? soundexMap[c] : '0';
+    }
 }
